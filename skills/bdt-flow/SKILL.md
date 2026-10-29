@@ -22,7 +22,7 @@ If `.bdt/dev/` is missing or older than the project's convention documents, or t
 | # | Step | Skill | Output | Gate |
 | - | ---- | ----- | ------ | ---- |
 | 1 | Understand | `ticket-brief` | brief.md (AC-NNN, facts/constraints/assumptions) | |
-| 2 | Ask | `ask-questions` | questions.md, ready to send | Stop if a blocking question is open |
+| 2 | Ask | `ask-questions` | questions.md (Q-IDs, status, needed by), ready to send; answers carried into the brief and tests | Stop if a blocking question is open; a non-blocking one goes on with its default as an assumption |
 | 3 | Plan | `dev-plan` | plan.md (impact, conventions, mirror, tasks) | **Gate 1: user approves the plan** |
 | 4 | Build | `dev-implement` | code + deviations in report.md | |
 | 5 | Verify | `qa-verify` (+ `qa-click-path` for "nothing happens" bugs) | report.md READY / READY WITH GAPS / NOT READY: ACs, regression rows, runtime QA | |

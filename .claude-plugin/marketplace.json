@@ -6,7 +6,7 @@
       "name": "bdt-kit",
       "source": "./",
       "description": "BA → Dev → Test workflow skills, per-project dev profiles and review agents.",
-      "version": "0.5.1"
+      "version": "0.5.2"
     }
   ]
 }

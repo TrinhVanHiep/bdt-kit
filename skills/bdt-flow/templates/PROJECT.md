@@ -44,7 +44,9 @@
 ## People and tone
 - Report language: <!-- e.g. Vietnamese -->
 - Ticket / PR comment language and tone: <!-- e.g. Vietnamese, reviewer "anh", author "em", no greeting, one idea per comment -->
-- Owners: BA <!-- name -->, BE <!-- name -->, Design <!-- name -->, QA <!-- name -->
+- Owners: BA <!-- name -->, PO/PM <!-- name -->, BE <!-- name -->, Design <!-- name -->, QA <!-- name -->
+- Third parties and integrations: <!-- e.g. payment provider, video platform, client's internal system: who answers for each -->
+- Decides conflicts: <!-- who settles a disagreement between sources; default BA for business rules and copy, PO for scope and priority -->
 
 ## Project rules that override the kit
 <!-- e.g. "no test suite: do not add tests", "tokens in localStorage on purpose", "no middleware/proxy on purpose" -->

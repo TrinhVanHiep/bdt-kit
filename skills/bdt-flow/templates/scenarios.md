@@ -62,8 +62,8 @@ Version: {{version}} · Date: {{date}} · Author: {{author}} · Sources: {{sourc
 | List sizes | 0 · 1 · one page · one page + 1 | |
 
 ## 8. Open questions
-| # | Question | Owner | Blocking | Answer |
-| - | -------- | ----- | -------- | ------ |
+| ID | Question | Owner | Blocking | Status | Answer |
+| -- | -------- | ----- | -------- | ------ | ------ |
 
 ## 9. Coverage
 | Item (BR / flow / transition / decision column) | Test cases | Gap |

@@ -16,5 +16,5 @@
 - <date> <question> → <answer> (by <owner>, where)
 
 ## Needs confirmation
-| Term / rule | Question | Owner | Asked on |
-| ----------- | -------- | ----- | -------- |
+| Term / rule | Q-ID | Question | Owner | Asked on |
+| ----------- | ---- | -------- | ----- | -------- |

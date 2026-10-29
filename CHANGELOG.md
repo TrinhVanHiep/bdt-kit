@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2 (2026-10-29)
+`ask-questions` after a review:
+- Question lifecycle: IDs `Q-01…` shared by questions.md, the brief, CONTEXT.md and scenarios; status Open / Answered / Default applied / Obsolete; answers matched by ID and carried into the brief (`[revised rN]`), CONTEXT.md, scenarios, test cases and anything already built on the default.
+- Defaults: a non-blocking question goes on with its default as an assumption; a blocking one never does; client-owned values stay placeholders. A non-blocking question past its needed-by date becomes Default applied. Test-case Expected follows the decision or the default in force; open points go in Note with the Q-ID, never "cần xác nhận" in Expected.
+- Conflicts between sources or owners: one question to the decision owner ("Decides conflicts" in PROJECT.md; default BA for rules and copy, PO for scope) with both sides and their versions.
+- Owners PO/PM and third parties; needed-by dates; document versions and the places checked in Evidence; neutral wording; blocking first and at most 10 questions per message; personal data masked in screenshots.
+- Fallbacks without a ticket (branch name), PROJECT.md (user's language, numbered, no greeting) or template (columns defined in the skill). questions.md becomes one table with an Owner column plus per-owner messages; PROJECT.md and project-onboard ask for PO/PM, third parties and the decision owner.
+
 ## 0.5.1 (2026-10-29)
 `qa-verify` after a tester's review:
 - Step 0 Inputs: no ticket → branch name; no brief → ACs derived from the diff, marked `Derived`, verdict at best READY WITH GAPS; no plan → step 3 skipped as a gap; no PROJECT.md → commands from the project rules and manifest scripts.

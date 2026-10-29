@@ -43,7 +43,17 @@ After changing a skill description, open a new session in a sample repo and try 
 | "viết hướng dẫn sử dụng cho admin giống tài liệu cũ <docx>" | ba-user-guide + doc-from-template | inspects the sample's blocks, picks prototypes, plans screenshots on a local or test environment |
 | "audit lại xem có làm đúng rule không" | kit-audit | collects the branch diff and work folder, walks the project rules |
 
-## Testing
+## Questions
+| Prompt | Expected skill | First action |
+| ------ | -------------- | ------------ |
+| "soạn câu hỏi gửi BA cho ticket này" | ask-questions | reads the brief's open points and the sources, records where it looked, then drafts Q-01… with needed-by dates |
+| "BA trả lời rồi: 1. có 2. lấy theo Figma 3. chưa chốt" | ask-questions | matches each answer to its Q-ID, marks Answered, revises the ACs as `[revised rN]` and updates CONTEXT.md, scenarios and test cases |
+
+- A message to one owner holds at most 10 questions, blocking first, numbered with the Q-IDs, with no blaming wording.
+- A blocking question is never answered with its default; a non-blocking one past its needed-by date becomes Default applied and is reported as an assumption.
+- When BA and Design disagree, one question goes to the decision owner with both sides and their versions.
+- A test case never has "cần xác nhận" in Expected; the open point is in Note with its Q-ID.
+
 | Prompt | Expected skill | First action |
 | ------ | -------------- | ------------ |
 | "chạy test case theo sheet này <xlsx>, môi trường staging" | qa-run | `docfill.py inspect` on the sheet, asks for scope, build, accounts and the result words; lists the cases that change data and asks once |

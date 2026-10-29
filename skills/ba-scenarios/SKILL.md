@@ -18,7 +18,7 @@ Any of: ticket or story (with comments and attachments), requirements doc sectio
    - **exception flows** (`E1`, `E2`): condition, system response, the exact message or `error.code`, recovery;
    - **business rules** (`BR-<AREA>-001`): the rule, its source (doc section, ticket, client decision), and whether it is enforced in the frontend, the backend, or both;
    - **data rules**: field, type, required, limits, format, default, source of the value;
-   - postconditions; open questions with owner (never invent an answer).
+   - postconditions; open questions with Q-IDs in the `ask-questions` format (never invent an answer).
 2. **Test cases** (default `test-cases.csv`, or the user's sheet): one row per case with ID, scenario/BR covered, preconditions, steps, test data, expected result, priority, type (positive / negative / boundary / permission / state / transition / date / concurrency), and empty result columns for the tester. Group rows by screen or flow (a `_section` row in workbook templates).
 3. **Test data plan**: the accounts each case needs by role and status (where they are defined, never passwords), records in each state the cases use, list sizes (0, 1, exactly one page, one page + 1), long and special text, and how the data is made (seed, fixture, local mock). No real personal data.
 4. A coverage line: every BR and every flow has at least one test case; list any that do not and why.
@@ -38,6 +38,7 @@ Any of: ticket or story (with comments and attachments), requirements doc sectio
 
 ## Test-case quality (check every row before handing over)
 - One expected result per case, observable on the screen, in the response or in the data. Banned without detail: "correctly", "normally", "as expected", "works".
+- Expected follows the confirmed rule or the default in force. An open point goes in the Note column with its Q-ID; "to be confirmed" or "cần xác nhận" never appears in Expected. A case that depends on an open blocking question is marked pending in Note.
 - Concrete test data (the value, not "a valid email"); steps someone new can run with exact UI labels.
 - Cases are independent: a case that needs data from another says so in its preconditions.
 - Priority follows the risk: main flows and BRs with money, access or data loss are High.

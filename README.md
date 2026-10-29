@@ -88,6 +88,7 @@ Open Claude Code in your **project** folder, not in `~/bdt-kit`.
 | Run test cases and fill in the results | `/qa-run` and attach the test-case sheet, name the environment |
 | Retest fixed bugs | `/qa-run retest <bug IDs>` |
 | Write a bug report | `/qa-bug-report` and describe what failed |
+| Record answers from BA, BE or the client | `/ask-questions` and paste the answers |
 | Exploratory testing | `/qa-run explore <area and time-box>` |
 | Automate a test case or a fixed bug | `/qa-automate <case or bug ID>` |
 | Review a PR | `/pr-review <PR link>` |
@@ -116,7 +117,7 @@ ls -la ~/.claude/skills ~/.claude/agents | grep bdt-kit
 | `project-onboard` | a repo + links it cannot tell + your sample documents | `.bdt/PROJECT.md`, `dev/` (via `dev-profile`), `CONTEXT.md` (glossary), `TESTS.md` (registry), `templates/` |
 | `dev-profile` | coding convention and architecture documents (md, docx, pdf, Google Doc, wiki), lint/CI config, the repo | `.bdt/dev/`: `STACK.md` (versions, app types, architecture), `CONVENTIONS.md` (CONV rules with source, golden files and a check), stack packs |
 | `ticket-brief` | ticket (+ parent, comments, attachments), requirements, design, API spec, code | `brief.md`: AC-NNN, facts vs constraints vs assumptions, edge cases, READY / BLOCKED |
-| `ask-questions` | open points with evidence | `questions.md` by owner + paste-ready messages in your team's tone |
+| `ask-questions` | open points with evidence; later, the answers | `questions.md` with Q-IDs, status and needed-by dates; paste-ready messages per owner (blocking first, at most 10, neutral tone); answers carried into the brief, ACs, scenarios and test cases |
 | `ba-scenarios` | the same sources as a brief | business scenarios (flows A/E, BR-xxx, data rules) + test cases, in your template |
 | `ba-user-guide` | role, features, environment, sample | user guide with steps, exact labels, screenshots, FAQ, troubleshooting |
 | `doc-from-template` | a sample file (.docx, .xlsx, .csv, .md, Google Doc/Sheet) + content | the document in the sample's format, plus a mapping note and checks |

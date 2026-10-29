@@ -4,6 +4,7 @@ Run: python3 tools/selftest.py   (no third-party packages needed)"""
 
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -124,6 +125,49 @@ def main():
         json.dump(bad, open(data_path, 'w', encoding='utf-8'))
         proc = subprocess.run([sys.executable, DOCFILL, 'fill', xlsx, data_path, xout], capture_output=True, text=True)
         check('xlsx rejects a column the template does not have', proc.returncode != 0 and 'Unknown' in (proc.stderr + proc.stdout))
+
+        # results: test execution written back into a filled sheet, matched by ID.
+        run_files = dict(XLSX_FILES)
+        run_files['xl/sharedStrings.xml'] = XLSX_FILES['xl/sharedStrings.xml'].replace(
+            '</sst>', '<si><t>結果</t></si><si><t>Bug ID</t></si><si><t>正常系</t></si><si><t>完了画面</t></si><si><t>異常系</t></si><si><t>エラー</t></si></sst>')
+        run_files['xl/worksheets/sheet1.xml'] = '''<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>
+<row r="3"><c r="A3" t="s" s="1"><v>1</v></c><c r="B3" t="s" s="1"><v>2</v></c><c r="C3" t="s" s="1"><v>3</v></c><c r="D3" t="s" s="1"><v>4</v></c><c r="E3" t="s" s="1"><v>5</v></c></row>
+<row r="4"><c r="A4" s="2"><v>1</v></c><c r="B4" s="2" t="s"><v>6</v></c><c r="C4" s="2" t="s"><v>7</v></c><c r="D4" s="2"/><c r="E4" s="2"/></row>
+<row r="5"><c r="A5" s="2"><v>2</v></c><c r="B5" s="2" t="s"><v>8</v></c><c r="C5" s="2" t="s"><v>9</v></c><c r="D5" s="2"/><c r="E5" s="2"/></row>
+<row r="7"><c r="D7"><f>COUNTIF(D4:D5,"NG")</f><v>0</v></c></row>
+</sheetData></worksheet>'''
+        run_sheet = os.path.join(tmp, 'run.xlsx')
+        build(run_sheet, run_files)
+        json.dump({'id_column': 'No', 'rows': [{'No': 2, '結果': 'NG', 'Bug ID': 'BUG-REG-001'}]},
+                  open(data_path, 'w', encoding='utf-8'), ensure_ascii=False)
+        rout = os.path.join(tmp, 'run-results.xlsx')
+        result = json.loads(run('results', run_sheet, data_path, rout))
+        lines = {l.split(':', 1)[0]: l for l in run('text', rout).splitlines()}
+        check('results updates only the row with that ID',
+              result['rows_updated'] == 1 and lines['5'].startswith('5: 2 | 異常系 | エラー | NG | BUG-REG-001')
+              and 'NG' not in lines['4'] and lines['4'].startswith('4: 1 | 正常系 | 完了画面'))
+        with zipfile.ZipFile(rout) as z:
+            sheet_xml = z.read('xl/worksheets/sheet1.xml').decode()
+            book_xml = z.read('xl/workbook.xml').decode()
+        check('results keeps cell styles and formulas, recalculated on open',
+              re.search(r'<c [^>]*r="D5"[^>]*s="2"|<c [^>]*s="2"[^>]*r="D5"', sheet_xml) is not None
+              and 'COUNTIF(D4:D5,"NG")' in sheet_xml and 'fullCalcOnLoad="1"' in book_xml)
+        rejected = []
+        for bad_rows, out_path in (([{'No': 99, '結果': 'OK'}], rout), ([{'No': 1, 'Unknown': 'OK'}], rout), ([{'No': 1, '結果': 'OK'}], run_sheet)):
+            json.dump({'id_column': 'No', 'rows': bad_rows}, open(data_path, 'w', encoding='utf-8'), ensure_ascii=False)
+            proc = subprocess.run([sys.executable, DOCFILL, 'results', run_sheet, data_path, out_path], capture_output=True, text=True)
+            rejected.append(proc.returncode != 0)
+        check('results rejects an unknown ID, an unknown column and writing over the input', all(rejected))
+
+        run_csv = os.path.join(tmp, 'run.csv')
+        open(run_csv, 'w', encoding='utf-8').write('ID,Scenario,Result\nTC-1,Đăng ký,\nTC-2,Đăng nhập,\n')
+        json.dump({'rows': [{'ID': 'TC-2', 'Result': 'Pass'}]}, open(data_path, 'w', encoding='utf-8'))
+        rcsv = os.path.join(tmp, 'run-results.csv')
+        run('results', run_csv, data_path, rcsv)
+        text = open(rcsv, encoding='utf-8-sig').read()
+        check('csv results updates by ID and keeps the BOM',
+              open(rcsv, 'rb').read().startswith(b'\xef\xbb\xbf') and 'TC-1,Đăng ký,\n' in text and 'TC-2,Đăng nhập,Pass' in text)
 
         csv_path = os.path.join(tmp, 't.csv')
         open(csv_path, 'w', encoding='utf-8').write('ID,Scenario,Expected\n')

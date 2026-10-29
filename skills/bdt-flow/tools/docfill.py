@@ -7,6 +7,7 @@ Usage:
   docfill.py fill    <template> <data.json> <out>
   docfill.py build   <sample.docx> <content.json> <out>   new document in the sample's look (see docx_build)
   docfill.py check   <file>                     JSON: placeholders left over after a fill (exit 1 if any)
+  docfill.py results <sheet.xlsx|csv> <results.json> <out>   write test results into existing rows matched by ID
 
 Template conventions (docx and xlsx):
   {{key}}            replaced by data["key"] (newlines become line breaks in docx)
@@ -14,6 +15,9 @@ Template conventions (docx and xlsx):
   {{list[]}}         alone in a paragraph (docx): the paragraph is repeated for each string in data["list"]
 xlsx without placeholders: data["sheets"][name] = {"header_row": N (optional), "rows": [{"<column header>": value}]}
 appends rows under the header, copying the style of the first data row.
+results: {"sheet": name (xlsx, optional), "header_row": N (optional), "id_column": "ID" (default),
+"rows": [{"ID": "TC-001", "<column header>": value}]} sets only the named cells of the row with that ID;
+every other cell, style and formula is kept, and the input file is never overwritten.
 """
 
 import copy
@@ -980,6 +984,109 @@ def csv_fill(template, data, out):
         writer.writerows(rows)
 
 
+# ---------- results (test execution written back by ID) ----------
+
+def result_key(value):
+    text = str(value).strip()
+    return text[:-2] if re.fullmatch(r'-?\d+\.0', text) else text
+
+
+def result_updates(data, columns):
+    """{id: {column: value}} from data["rows"]; the ID column and every other column must be in the header."""
+    id_column = data.get('id_column', 'ID')
+    if id_column not in columns:
+        raise SystemExit(f'ID column "{id_column}" not in the header; pass "id_column". Header: {list(columns)}')
+    unknown = sorted({k for r in data.get('rows', []) for k in r} - set(columns))
+    if unknown:
+        raise SystemExit(f'Columns not in the header: {unknown}. Header: {list(columns)}')
+    updates = {}
+    for r in data.get('rows', []):
+        key = result_key(r.get(id_column, ''))
+        if not key or key in updates:
+            raise SystemExit(f'Each result row needs its own "{id_column}"; missing or repeated: {r}')
+        updates[key] = {columns[k]: v for k, v in r.items() if k != id_column}
+    return id_column, updates
+
+
+def recalc_on_open(content):
+    root = parse(content)
+    calc = root.find(s('calcPr'))
+    if calc is None:
+        calc = ET.SubElement(root, s('calcPr'))
+    # Pass/fail counts and other formulas that read the result cells are recalculated when the file is opened.
+    calc.set('fullCalcOnLoad', '1')
+    return serialize(root)
+
+
+def xlsx_results(path, data, out):
+    book = Workbook(path)
+    names = [name for name, _ in book.sheets]
+    name = data.get('sheet') or names[0]
+    part = dict(book.sheets).get(name)
+    if part is None:
+        raise SystemExit(f'Sheet not in the workbook: {name}. Sheets: {names}')
+    root = parse(book.zip.read(part))
+    rows = book.rows(part, root)
+    block = header_block(rows, root, data.get('header_row'))
+    if block is None:
+        raise SystemExit(f'No header row found in sheet {name}; pass "header_row".')
+    _, bottom, columns = block
+    id_column, updates = result_updates(data, columns)
+    row_els = {int(r.get('r')): r for r in root.find(s('sheetData')).findall(s('row'))}
+    seen = {}
+    for number, cells in rows:
+        key = result_key(cells.get(columns[id_column], ''))
+        if number <= bottom or key not in updates:
+            continue
+        if key in seen:
+            raise SystemExit(f'ID {key} is on rows {seen[key]} and {number} of sheet {name}; pass an "id_column" that is unique.')
+        seen[key] = number
+        for col, value in updates[key].items():
+            set_cell(row_els[number], number, col, value, None)
+    missing = [k for k in updates if k not in seen]
+    if missing:
+        raise SystemExit(f'IDs not found in sheet {name}: {missing}')
+    with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as zout:
+        for item in book.zip.infolist():
+            content = book.zip.read(item.filename)
+            if item.filename == part:
+                content = serialize(root)
+            elif item.filename == 'xl/workbook.xml':
+                content = recalc_on_open(content)
+            elif item.filename == 'xl/calcChain.xml':
+                continue  # Excel rebuilds it; a stale chain makes the file "need repair".
+            elif item.filename == '[Content_Types].xml':
+                content = re.sub(rb'<Override PartName="/xl/calcChain.xml"[^>]*/>', b'', content)
+            elif item.filename == 'xl/_rels/workbook.xml.rels':
+                content = re.sub(rb'<Relationship [^>]*Target="calcChain.xml"[^>]*/>', b'', content)
+            zout.writestr(item, content)
+    return len(seen)
+
+
+def csv_results(path, data, out):
+    with open(path, encoding='utf-8-sig', newline='') as f:
+        reader = csv.DictReader(f)
+        columns, rows = reader.fieldnames or [], list(reader)
+    id_column, updates = result_updates(data, {c: c for c in columns})
+    seen = set()
+    for row in rows:
+        key = result_key(row.get(id_column, ''))
+        if key not in updates:
+            continue
+        if key in seen:
+            raise SystemExit(f'ID {key} appears twice in {path}; pass an "id_column" that is unique.')
+        seen.add(key)
+        row.update(updates[key])
+    missing = [k for k in updates if k not in seen]
+    if missing:
+        raise SystemExit(f'IDs not found in {path}: {missing}')
+    with open(out, 'w', encoding='utf-8-sig', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=columns)
+        writer.writeheader()
+        writer.writerows(rows)
+    return len(seen)
+
+
 # ---------- cli ----------
 
 def kind(path):
@@ -1019,6 +1126,14 @@ def main(argv):
             raise SystemExit('build works on .docx samples; for xlsx use fill with "sheets".')
         docx_build(path, json.load(open(argv[3], encoding='utf-8')), argv[4])
         print(json.dumps({'written': argv[4], 'placeholders_left': leftovers(argv[4])}, ensure_ascii=False))
+    elif command == 'results':
+        if k not in ('xlsx', 'csv'):
+            raise SystemExit('results works on .xlsx and .csv sheets.')
+        if os.path.abspath(argv[4]) == os.path.abspath(path):
+            raise SystemExit('Write the results to a new file; the input sheet is never overwritten.')
+        data = json.load(open(argv[3], encoding='utf-8'))
+        updated = {'xlsx': xlsx_results, 'csv': csv_results}[k](path, data, argv[4])
+        print(json.dumps({'written': argv[4], 'rows_updated': updated}, ensure_ascii=False))
     elif command == 'check':
         left = leftovers(path)
         print(json.dumps({'placeholders_left': left}, ensure_ascii=False))

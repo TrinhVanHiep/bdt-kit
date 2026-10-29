@@ -84,6 +84,9 @@ Open Claude Code in your **project** folder, not in `~/bdt-kit`.
 | A user guide | `/ba-user-guide <role and features>` |
 | Any document in your company's format | `/doc-from-template` and attach the sample |
 | Check a change before a PR | `/qa-verify` |
+| Run test cases and fill in the results | `/qa-run` and attach the test-case sheet, name the environment |
+| Retest fixed bugs | `/qa-run retest <bug IDs>` |
+| Write a bug report | `/qa-bug-report` and describe what failed |
 | Review a PR | `/pr-review <PR link>` |
 | Check that the kit is installed | `/kit-setup` |
 
@@ -118,6 +121,8 @@ ls -la ~/.claude/skills ~/.claude/agents | grep bdt-kit
 | `dev-implement` | approved plan | the change, deviations logged, stop rules on errors |
 | `qa-verify` | the change, ACs, environment | `report.md` READY / NOT READY: convention checks, runtime QA by app type (browser at 375 / 768 / 1440, API calls, simulator, CLI runs) |
 | `qa-click-path` | a page and a symptom | traced handler findings (`CLICK-PATH-NNN`) |
+| `qa-run` | test cases (sheet, `ba-scenarios` output or `TESTS.md` rows), environment and build, test accounts | Pass / Fail / Blocked / Not run with evidence per case, written into a copy of the sheet; bug drafts; retest; `summary.md` with a GO / NO-GO recommendation |
+| `qa-bug-report` | a failure, environment and build, the requirement behind the expected result | `bugs/BUG-<AREA>-NNN.md` + a paste-ready report for the tracker (posted only on request) |
 | `pr-review` | a PR or a diff | findings with proof + comment drafts (posted only on request) |
 | `council` | a decision with options | recommendation with the strongest dissent |
 | `lesson-eval` | a fixed bug or review defect | Save / Improve / Absorb / Drop into the lessons file |
@@ -148,14 +153,15 @@ Give a sample and say what you want, for example "làm test case theo file này"
 
 Save project samples as `.bdt/templates/<kind>.<ext>` so they are found next time.
 
-`skills/bdt-flow/tools/docfill.py` has five commands:
+`skills/bdt-flow/tools/docfill.py` has six commands:
 - `text`: read .docx / .xlsx as plain text;
 - `inspect`: headings, blocks, tables and placeholders; for workbooks, sheets, header rows (two-row merged headers become `PC / Lần 1`) and the labels above them;
 - `fill`: `{{key}}`, repeated rows `{{list.field}}`, repeated paragraphs `{{list[]}}`; for workbooks, `fields` by label, `rows` by column name, `_section` group rows and `clear_existing`. Formulas are kept and recalculated on open;
 - `build`: a new .docx in the look of a past document. It reuses the sample's paragraphs as prototypes (heading, body, bullet, table, image), keeps its page setup, header and footer, and embeds PNG/JPEG screenshots;
-- `check`: placeholders left over.
+- `check`: placeholders left over;
+- `results`: test results written into the existing rows of a filled .xlsx / .csv sheet, matched by ID, into a copy. Only the named cells change; styles, dropdowns and formulas stay.
 
-Defaults when you have no sample: `skills/bdt-flow/templates/` (brief, questions, plan, report, scenarios, test-cases.csv, user-guide, CONTEXT, TESTS, PROJECT, STACK, CONVENTIONS).
+Defaults when you have no sample: `skills/bdt-flow/templates/` (brief, questions, plan, report, scenarios, test-cases.csv, bug, test-summary, user-guide, CONTEXT, TESTS, PROJECT, STACK, CONVENTIONS).
 
 ## Per project
 Put project facts and overrides in `.bdt/PROJECT.md`, the stack and coding conventions in `.bdt/dev/` (`dev-profile`), and project playbooks in that repo's `.claude/skills/`. Change the kit only for lessons that hold across projects (`lesson-eval` → Promote). `.bdt/` is listed in `.git/info/exclude`, so it is never committed.

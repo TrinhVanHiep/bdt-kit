@@ -28,7 +28,7 @@ Any of: ticket or story (with comments and attachments), requirements doc sectio
 - Each BR → a case that proves it holds and one that tries to break it.
 - Each data rule → boundaries (empty, whitespace only, max length and max + 1, full-width characters, emoji, invalid format, pasted text).
 - States from the project glossary (membership status, publication status…) → one case per state that changes what the user sees.
-- Platform columns in the template (PC / Tablet / iOS / Android, or breakpoints) are left for the tester; do not mark results you did not run.
+- Platform columns in the template (PC / Tablet / iOS / Android, or breakpoints) are left for the tester; do not mark results you did not run. To run the cases and fill the results, use `qa-run`.
 
 ## Rules
 - Business rules come from requirements, tickets or the client. Behaviour read from the code is labelled "current behaviour" and becomes a question when it differs from the documents.

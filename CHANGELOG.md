@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.5.0 (2026-10-29)
+Testing as a full loop: run the cases, record results with evidence, log bugs, retest, regression, report, automate.
+- `qa-run` skill: runs a test-case sheet, `ba-scenarios` output or `TESTS.md` rows on an environment the user names. Pass / Fail / Blocked / Not run with evidence per case; never a Pass for a case not run; platform columns only for platforms actually run (desktop Chrome at 375 is not iOS). Cases that change data on a shared environment need one go-ahead per run. Modes: run, retest, regression, explore (time-boxed charter). Ends with `summary.md`: counts, coverage by requirement, bugs, risks, GO / NO-GO recommendation.
+- `qa-bug-report` skill: reproduce twice, reduce the steps, check duplicates, expected result with a source (no source → a question); drafts in the tracker's format and tone, posted only on request.
+- `qa-automate` skill: automated tests in the project's own suite only, at the lowest level that catches the failure, mirroring the existing tests, without fixed sleeps or CSS-path selectors, proven to fail without the fix. No suite: proposes one and stops.
+- `docfill.py results`: writes results into the existing rows of a filled .xlsx / .csv sheet, matched by ID, into a copy in the same format; styles, dropdowns and formulas kept and recalculated on open. It refuses to write over the input (also under another name on a case-insensitive disk or through a symlink) and refuses a column name the header repeats; `header_rows` forces a two-row header.
+- `docfill.py` reads workbook text without furigana (`<rPh>`), so Japanese headers such as 結果 are no longer read as 結果ケッカ (fixed for `text`, `inspect`, `fill` and `results`). `selftest.py`: 28 checks.
+- `qa-verify`: a Regression step (`TESTS.md` rows of the touched areas plus smoke rows); throttled network and CPU for loading states and races; another user's record by ID; browsers and devices not run are reported as not run.
+- `ba-scenarios`: decision tables and pairwise, state transitions including forbidden ones, date and timezone boundaries, access to another user's record, concurrent edits; a test data plan; test-case quality checks.
+- Templates: `bug.md` (default severity and priority scale), `test-summary.md`; `TESTS.md` gets Tags (`smoke`, `regression`); `report.md` gets a Regression table and the browsers run; `scenarios.md` gets transitions, decision tables and test data; `brief.md` edge cases get dates, another user's record, forbidden transitions and concurrent edits; `PROJECT.md` gets supported browsers and devices, test data, test environments and a Testing section (sheet, tracker, severity scale, release criteria), which `project-onboard` asks for.
+- `bdt-flow`: a Testing table; a bug fix in a repo with a test suite gets a regression test through `qa-automate`.
+- Evals: testing prompts and behaviour checks.
+
 ## 0.4.0 (2026-10-29)
 The dev steps no longer assume a stack. Each project gets a dev profile built from its own inputs.
 - `dev-profile` skill: reads coding convention and architecture documents (md, docx, pdf, Google Doc, wiki), lint/formatter/CI config, manifests and lockfiles. It writes `.bdt/dev/STACK.md` (installed versions, app types, architecture with golden files) and `.bdt/dev/CONVENTIONS.md`: CONV rules, each with a source, golden files, today's violation count and a check. Rule status is `confirmed` / `observed` / `conflict` / `legacy` / `retired`. It also has an update mode and an optional export as a project skill (asks first).

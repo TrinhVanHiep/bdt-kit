@@ -39,14 +39,32 @@ Version: {{version}} · Date: {{date}} · Author: {{author}} · Sources: {{sourc
 **Business rules:** BR-<AREA>-001
 **Test cases:** TC-<AREA>-001…
 
-## 5. States
+## 5. States and transitions
 | State | What the user sees | What the user can do |
 | ----- | ------------------ | -------------------- |
 
-## 6. Open questions
+<!-- Each allowed transition once; forbidden ones the UI or API could still be asked for, with the expected refusal. -->
+| From | Action | To | Allowed | Source | Test case |
+| ---- | ------ | -- | ------- | ------ | --------- |
+
+## 6. Decision tables
+<!-- Only where several conditions combine to decide the result. One column per combination that changes the result. -->
+| Condition / result | 1 | 2 | 3 |
+| ------------------ | - | - | - |
+| <condition> | Y | N | Y |
+| **Result** | | | |
+
+## 7. Test data
+| Need | Value or how it is made | Used by |
+| ---- | ----------------------- | ------- |
+| <role / status> account | <!-- where it is defined (seed file); never a password --> | |
+| Records in state <state> | <!-- seed, fixture, local mock --> | |
+| List sizes | 0 · 1 · one page · one page + 1 | |
+
+## 8. Open questions
 | # | Question | Owner | Blocking | Answer |
 | - | -------- | ----- | -------- | ------ |
 
-## 7. Coverage
-| Item (BR / flow) | Test cases | Gap |
-| ---------------- | ---------- | --- |
+## 9. Coverage
+| Item (BR / flow / transition / decision column) | Test cases | Gap |
+| ----------------------------------------------- | ---------- | --- |

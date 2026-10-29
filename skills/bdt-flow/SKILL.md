@@ -15,7 +15,7 @@ If `.bdt/PROJECT.md` is missing, run `project-onboard` first. It gives links, co
 If `.bdt/dev/` is missing or older than the project's convention documents, or the user hands over coding conventions, run `dev-profile` before step 3. It gives the stack, app types and CONV rules that plan, build, verify and review follow.
 
 ## Work folder
-`.bdt/work/<TICKET-ID>/` holds `brief.md`, `questions.md`, `plan.md`, `report.md`. It is local (listed in `.git/info/exclude`). It is also the memory of the ticket: before a long step or a context compaction, write the current state there, so work resumes from the file, not from recollection.
+`.bdt/work/<TICKET-ID>/` holds `brief.md`, `questions.md`, `plan.md`, `report.md`, and from testing `bugs/` and `run-<YYYYMMDD>/`. It is local (listed in `.git/info/exclude`). It is also the memory of the ticket: before a long step or a context compaction, write the current state there, so work resumes from the file, not from recollection.
 
 ## Steps
 
@@ -25,7 +25,7 @@ If `.bdt/dev/` is missing or older than the project's convention documents, or t
 | 2 | Ask | `ask-questions` | questions.md, ready to send | Stop if a blocking question is open |
 | 3 | Plan | `dev-plan` | plan.md (impact, conventions, mirror, tasks) | **Gate 1: user approves the plan** |
 | 4 | Build | `dev-implement` | code + deviations in report.md | |
-| 5 | Verify | `qa-verify` (+ `qa-click-path` for "nothing happens" bugs) | report.md READY / NOT READY | |
+| 5 | Verify | `qa-verify` (+ `qa-click-path` for "nothing happens" bugs) | report.md READY / NOT READY: ACs, regression rows, runtime QA | |
 | 6 | Review | `pr-review` on own diff (self mode) | findings fixed or listed | |
 | 7 | Ship | commit, push, PR (project conventions) | PR link, ticket comment draft | **Gate 2: user approves commit/PR/comment** |
 | 8 | Learn | `lesson-eval` | lesson saved, absorbed or dropped | |
@@ -39,7 +39,17 @@ If `.bdt/dev/` is missing or older than the project's convention documents, or t
 | Questions for BA / BE / design | `ask-questions` | `templates/questions.md` |
 | Any document "like this sample" | `doc-from-template` | the sample's format: .docx, .xlsx, .csv, .md, Google Doc/Sheet |
 
-Reading inputs (tickets, Google Docs and Sheets, docx/xlsx, PDF, Figma, Swagger, the running app): `references/inputs.md`. Tools: `tools/docfill.py` (`text`, `inspect`, `fill`, `build`, `check`; standard library only) and `tools/selftest.py`.
+## Testing (running tests, not writing them)
+| Ask | Skill | Output |
+| --- | ----- | ------ |
+| Run test cases, smoke test a new build | `qa-run` | results with evidence in a copy of the sheet (`docfill.py results`), `summary.md` |
+| Retest fixed bugs | `qa-run` (retest) | verified or reopened, with evidence |
+| Regression run | `qa-run` (regression) | `TESTS.md` rows run, evidence dates updated |
+| Exploratory session | `qa-run` (explore) | session notes: charter, coverage, bugs, questions, test ideas |
+| Bug report | `qa-bug-report` | `bugs/BUG-<AREA>-NNN.md` + tracker-ready text (posted only on request) |
+| Automated tests | `qa-automate` | tests in the project's own suite, proven to fail without the fix |
+
+Reading inputs (tickets, Google Docs and Sheets, docx/xlsx, PDF, Figma, Swagger, the running app): `references/inputs.md`. Tools: `tools/docfill.py` (`text`, `inspect`, `fill`, `build`, `check`, `results`; standard library only) and `tools/selftest.py`.
 
 Project samples live in `.bdt/templates/` (registered by `project-onboard` or `doc-from-template`) and win over the kit defaults.
 
@@ -52,7 +62,7 @@ A blocked ticket is a valid outcome of step 1–2, not a failure. Deliver: the b
 
 ## Intent changes the order
 - **New feature:** steps as above.
-- **Bug fix:** reproduce first (browser + console + network, read `error.code`), state the root cause with evidence, grep for the same pattern elsewhere; the brief's AC-001 is "the reproduction no longer happens". A lesson entry is mandatory if the project keeps one.
+- **Bug fix:** reproduce first (browser + console + network, read `error.code`), state the root cause with evidence, grep for the same pattern elsewhere; the brief's AC-001 is "the reproduction no longer happens". When the project has a test suite, `qa-automate` adds a regression test that fails before the fix and passes after. A lesson entry is mandatory if the project keeps one.
 - **Change to existing behaviour:** list every screen and call site that reads the changed thing before planning (an admin field is not done until every member screen that reads it is checked).
 - **Backend contract change (handoff doc):** grep every use of each removed or renamed field and value (types, constants, payloads, query params, i18n), and check the request body in the network tab, not just that the screen renders.
 

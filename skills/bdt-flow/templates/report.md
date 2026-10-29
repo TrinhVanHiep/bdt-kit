@@ -17,8 +17,14 @@ Verdict: READY | NOT READY · Plan: ./plan.md · Branch: <branch> · Commit: <sh
 | AC | Evidence | Status |
 | -- | -------- | ------ |
 
+## Regression
+<!-- TESTS.md rows of the areas the change touches, plus smoke rows. "Not run" with a reason is allowed; a silent gap is not. -->
+| TEST ID | Why picked | Result | Evidence |
+| ------- | ---------- | ------ | -------- |
+
 ## Runtime QA
 Verdict: SHIP | SHIP WITH FIXES | DO NOT SHIP | INCONCLUSIVE · App type: <!-- web UI | API | mobile | CLI/library | worker -->
+Browsers / devices run: <!-- e.g. Chrome 130 desktop --> · Not run: <!-- supported ones from PROJECT.md that were not run -->
 <!-- Web UI: one row per page or state at each breakpoint in PROJECT.md. -->
 | Page / state | 375 | 768 | 1440 | Console / network | Notes |
 | ------------ | --- | --- | ---- | ----------------- | ----- |

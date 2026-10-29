@@ -1,6 +1,6 @@
 ---
 name: qa-run
-description: Execute test cases on an environment the user names — a test-case sheet (.xlsx/.csv), the cases from ba-scenarios, or regression rows of .bdt/TESTS.md — recording Pass / Fail / Blocked / Not run with evidence for each case, writing the results into a copy of the sheet, drafting a bug for each failure, retesting fixed bugs, and ending with a test summary. Use when the user says "chạy test case", "test theo sheet này", "retest bug", "chạy regression", "smoke test bản build mới", or asks for a test run report.
+description: Execute test cases on an environment the user names — a test-case sheet (.xlsx/.csv), the cases from ba-scenarios, or regression rows of .bdt/TESTS.md — recording Pass / Fail / Blocked / Not run with evidence for each case, writing the results into a copy of the sheet, drafting a bug for each failure, retesting fixed bugs, running time-boxed exploratory sessions, and ending with a test summary. Use when the user says "chạy test case", "test theo sheet này", "retest bug", "chạy regression", "smoke test bản build mới", "test thăm dò", "exploratory test", or asks for a test run report.
 ---
 
 # qa-run
@@ -10,11 +10,11 @@ description: Execute test cases on an environment the user names — a test-case
 
 Templates: `../bdt-flow/templates/test-summary.md`, `../bdt-flow/templates/bug.md`. Work folder: `.bdt/work/<ticket, feature or release>/run-<YYYYMMDD>/` (`results.json`, `evidence/`, `summary.md`); bugs go in `.bdt/work/<id>/bugs/`.
 
-Modes: **run** (a set of cases), **retest** (bugs marked fixed), **regression** (registry rows or a regression sheet).
+Modes: **run** (a set of cases), **retest** (bugs marked fixed), **regression** (registry rows or a regression sheet), **explore** (a time-boxed session without scripted cases).
 
 ## 0. Before the first case
 - **Scope:** the case IDs, sections or priorities to run. Write it down: it is the denominator of the summary.
-- **Environment:** URL, build or commit, browser and device actually used. A result without its build is not evidence.
+- **Environment:** URL, build or commit, browser and device actually used, against the supported list in `.bdt/PROJECT.md`. A result without its build is not evidence.
 - **Accounts:** one per role and status the cases need. The user signs in; the kit never types a password (`../bdt-flow/references/inputs.md`).
 - **Test data:** check that the data each case needs exists. A case whose data is missing is Blocked, not improvised.
 - **The sheet:** `python3 ../bdt-flow/tools/docfill.py inspect <sheet>` for the column names (a two-row header gives names like `PC / Lần 1`), `text` for the cases. Read the sheet's own result words (dropdown, legend, the criteria in its count formulas, for example OK / NG / Pending) and map Pass / Fail / Blocked / Not run to them; ask when they are unclear.
@@ -43,7 +43,7 @@ Each Fail goes to `qa-bug-report`. Failures with the same cause share one bug, a
 
 ## 2. Write the results back
 1. Write `results.json`: `{"sheet": "<name>", "id_column": "<ID column>", "rows": [{"<ID column>": "TC-001", "<result column>": "OK", "<tested on column>": "Chrome 130 / 1440", "<date column>": "<date>", "<bug column>": "BUG-…"}]}`, with the sheet's own column names and result words.
-2. Run `python3 ../bdt-flow/tools/docfill.py results <sheet> results.json <sheet name>-results-<YYYYMMDD>.xlsx`. It writes a copy and never overwrites the user's file. Only the named cells change; styles, dropdowns and formulas stay, and the counts recalculate when the file is opened.
+2. Run `python3 ../bdt-flow/tools/docfill.py results <sheet> results.json run-<YYYYMMDD>/<sheet name>-results.<same extension as the sheet>`. It writes a copy and never overwrites the user's file. When `inspect` misses the second row of a header (it shows `PC` where the sheet has `PC / Lần 1`), add `"header_rows": [top, bottom]`; a column name the header repeats is refused rather than guessed. Only the named cells change; styles, dropdowns and formulas stay, and the counts recalculate when the file is opened.
 3. A Google Sheet: export it to .xlsx and write the copy. Writing into the Google Sheet itself (Sheets connector) is a separate step the user approves.
 4. Show the user the rows updated, the counts and the file path.
 
@@ -56,8 +56,14 @@ Each Fail goes to `qa-bug-report`. Failures with the same cause share one bug, a
 - Input: rows of `.bdt/TESTS.md` (by area or tag), or a regression sheet.
 - Record results as in a run. Update each row's Evidence (date) in `TESTS.md`; a row that was not run keeps its old date and is listed in the summary.
 
+## Explore
+For risks the scripted cases do not reach, agree a charter with the user first: the area, the risk or question, a time-box (for example 45 minutes), the environment, the data and the role.
+- Vary what the cases fix: unusual order of steps, back and reload in the middle of a flow, an interrupted flow, odd but valid data, roles and states combined, a slow network.
+- Note as you go what was tried and what was seen. Bugs go to `qa-bug-report`, questions to `ask-questions`, and ideas worth keeping become test cases in the `ba-scenarios` format.
+- Write `run-<YYYYMMDD>/explore-<area>.md`: charter, what was covered and what was not, bugs, questions, test ideas. The same safety rules apply: changes of data only on a local server or mock, or with the user's go-ahead.
+
 ## 3. Summary
-Write `summary.md` from `test-summary.md`: counts from the results, bugs, Blocked and Not run with reasons, risks, and a recommendation. Recommend GO only when every case in scope was run and no Critical or Major bug in scope is open; the team's own release criteria win, and the decision is theirs.
+Write `summary.md` from `test-summary.md`: counts from the results, bugs, Blocked and Not run with reasons, the coverage by requirement (each AC or BR from the sheet's scenario / rule column → its cases → result → bugs), risks, and a recommendation. Recommend GO only when every case in scope was run and no Critical or Major bug in scope is open; the team's own release criteria win, and the decision is theirs.
 
 ## Rules
 - Test data and test accounts only; no real personal data in inputs, screenshots or reports.

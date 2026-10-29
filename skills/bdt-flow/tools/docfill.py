@@ -15,7 +15,7 @@ Template conventions (docx and xlsx):
   {{list[]}}         alone in a paragraph (docx): the paragraph is repeated for each string in data["list"]
 xlsx without placeholders: data["sheets"][name] = {"header_row": N (optional), "rows": [{"<column header>": value}]}
 appends rows under the header, copying the style of the first data row.
-results: {"sheet": name (xlsx, optional), "header_row": N (optional), "id_column": "ID" (default),
+results: {"sheet": name (xlsx, optional), "header_row": N or "header_rows": [top, bottom] (optional), "id_column": "ID" (default),
 "rows": [{"ID": "TC-001", "<column header>": value}]} sets only the named cells of the row with that ID;
 every other cell, style and formula is kept, and the input file is never overwritten.
 """
@@ -544,6 +544,14 @@ def col_letter(n):
     return out
 
 
+def string_item_text(item):
+    """Text of a shared or inline string: its <t> and rich-text runs, without phonetic guides (<rPh>, furigana)."""
+    if item is None:
+        return ''
+    parts = [item.find(s('t'))] + [r.find(s('t')) for r in item.findall(s('r'))]
+    return ''.join(t.text or '' for t in parts if t is not None)
+
+
 class Workbook:
     def __init__(self, path):
         self.zip = zipfile.ZipFile(path)
@@ -551,7 +559,7 @@ class Workbook:
         self.shared = []
         if 'xl/sharedStrings.xml' in names:
             for si in parse(self.zip.read('xl/sharedStrings.xml')).findall(s('si')):
-                self.shared.append(''.join(t.text or '' for t in si.iter(s('t'))))
+                self.shared.append(string_item_text(si))
         rels = parse(self.zip.read('xl/_rels/workbook.xml.rels'))
         targets = {r.get('Id'): r.get('Target') for r in rels}
         workbook = parse(self.zip.read('xl/workbook.xml'))
@@ -563,7 +571,7 @@ class Workbook:
     def cell_value(self, c):
         kind = c.get('t')
         if kind == 'inlineStr':
-            return ''.join(t.text or '' for t in c.iter(s('t')))
+            return string_item_text(c.find(s('is')))
         v = c.find(s('v'))
         if v is None:
             return ''
@@ -667,11 +675,20 @@ def merges(root):
 
 def header_block(rows, root, forced=None):
     """Header rows and column names; a two-row header with merged parents gives names like "PC / Lần 1"."""
+    block = header_names(rows, root, forced)
+    if block is None:
+        return None
+    top, bottom, names = block
+    return top, bottom, {name: col for col, name in names.items()}
+
+
+def header_names(rows, root, forced=None, forced_bottom=None):
+    """(top, bottom, {column: name}) of the header; forced_bottom sets a header's last row when detection misses it."""
     top = forced or header_row(rows)
     if top is None:
         return None
     spans = merges(root)
-    bottom = top
+    bottom = forced_bottom or top
     if not forced:
         if any(r1 == top - 1 and r2 >= top for _, r1, _, r2, _ in spans):
             top -= 1
@@ -693,7 +710,7 @@ def header_block(rows, root, forced=None):
             if not value:
                 continue
             names[col] = f"{names[col]} / {value}" if col in names and names[col] != value else value
-    return top, bottom, {name.replace('\n', ' ').strip(): col for col, name in names.items()}
+    return top, bottom, {col: name.replace('\n', ' ').strip() for col, name in names.items()}
 
 
 def fill_fields(book, root, fields):
@@ -991,14 +1008,19 @@ def result_key(value):
     return text[:-2] if re.fullmatch(r'-?\d+\.0', text) else text
 
 
-def result_updates(data, columns):
-    """{id: {column: value}} from data["rows"]; the ID column and every other column must be in the header."""
+def result_updates(data, columns, repeated=()):
+    """{id: {column: value}} from data["rows"]; the ID column and every other column must be in the header, once."""
     id_column = data.get('id_column', 'ID')
+    clash = sorted(set(repeated) & ({id_column} | {k for r in data.get('rows', []) for k in r}))
+    if clash:
+        raise SystemExit(f'Column names repeat in the header, so the target is ambiguous: {clash}. '
+                         'For a two-row header pass "header_rows": [top, bottom]; otherwise rename the columns.')
     if id_column not in columns:
         raise SystemExit(f'ID column "{id_column}" not in the header; pass "id_column". Header: {list(columns)}')
     unknown = sorted({k for r in data.get('rows', []) for k in r} - set(columns))
     if unknown:
-        raise SystemExit(f'Columns not in the header: {unknown}. Header: {list(columns)}')
+        hint = f'; repeated names left out: {sorted(repeated)} (for a two-row header pass "header_rows": [top, bottom])' if repeated else ''
+        raise SystemExit(f'Columns not in the header: {unknown}. Header: {list(columns)}{hint}')
     updates = {}
     for r in data.get('rows', []):
         key = result_key(r.get(id_column, ''))
@@ -1027,11 +1049,15 @@ def xlsx_results(path, data, out):
         raise SystemExit(f'Sheet not in the workbook: {name}. Sheets: {names}')
     root = parse(book.zip.read(part))
     rows = book.rows(part, root)
-    block = header_block(rows, root, data.get('header_row'))
+    top, bottom = (data.get('header_rows') or [data.get('header_row'), None])[:2]
+    block = header_names(rows, root, top, bottom)
     if block is None:
         raise SystemExit(f'No header row found in sheet {name}; pass "header_row".')
-    _, bottom, columns = block
-    id_column, updates = result_updates(data, columns)
+    _, bottom, names = block
+    values = list(names.values())
+    repeated = {n for n in values if values.count(n) > 1}
+    columns = {n: col for col, n in names.items() if n not in repeated}
+    id_column, updates = result_updates(data, columns, repeated)
     row_els = {int(r.get('r')): r for r in root.find(s('sheetData')).findall(s('row'))}
     seen = {}
     for number, cells in rows:
@@ -1065,25 +1091,28 @@ def xlsx_results(path, data, out):
 
 def csv_results(path, data, out):
     with open(path, encoding='utf-8-sig', newline='') as f:
-        reader = csv.DictReader(f)
-        columns, rows = reader.fieldnames or [], list(reader)
-    id_column, updates = result_updates(data, {c: c for c in columns})
+        rows = list(csv.reader(f))
+    header = rows[0] if rows else []
+    repeated = {c for c in header if header.count(c) > 1}
+    columns = {c: i for i, c in enumerate(header) if c not in repeated}
+    id_column, updates = result_updates(data, columns, repeated)
+    id_index = columns[id_column]
     seen = set()
-    for row in rows:
-        key = result_key(row.get(id_column, ''))
+    for row in rows[1:]:
+        key = result_key(row[id_index] if id_index < len(row) else '')
         if key not in updates:
             continue
         if key in seen:
             raise SystemExit(f'ID {key} appears twice in {path}; pass an "id_column" that is unique.')
         seen.add(key)
-        row.update(updates[key])
+        for index, value in updates[key].items():
+            row.extend([''] * (index + 1 - len(row)))
+            row[index] = '' if value is None else str(value)
     missing = [k for k in updates if k not in seen]
     if missing:
         raise SystemExit(f'IDs not found in {path}: {missing}')
     with open(out, 'w', encoding='utf-8-sig', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=columns)
-        writer.writeheader()
-        writer.writerows(rows)
+        csv.writer(f).writerows(rows)
     return len(seen)
 
 
@@ -1129,8 +1158,10 @@ def main(argv):
     elif command == 'results':
         if k not in ('xlsx', 'csv'):
             raise SystemExit('results works on .xlsx and .csv sheets.')
-        if os.path.abspath(argv[4]) == os.path.abspath(path):
+        if os.path.exists(argv[4]) and os.path.samefile(argv[4], path):
             raise SystemExit('Write the results to a new file; the input sheet is never overwritten.')
+        if kind(argv[4]) != k:
+            raise SystemExit(f'Write the results in the same format as the sheet (.{k}).')
         data = json.load(open(argv[3], encoding='utf-8'))
         updated = {'xlsx': xlsx_results, 'csv': csv_results}[k](path, data, argv[4])
         print(json.dumps({'written': argv[4], 'rows_updated': updated}, ensure_ascii=False))

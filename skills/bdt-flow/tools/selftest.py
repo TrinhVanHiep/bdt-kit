@@ -160,6 +160,44 @@ def main():
             rejected.append(proc.returncode != 0)
         check('results rejects an unknown ID, an unknown column and writing over the input', all(rejected))
 
+        refused = []
+        link = os.path.join(tmp, 'link.xlsx')
+        os.symlink(run_sheet, link)
+        json.dump({'id_column': 'No', 'rows': [{'No': 1, '結果': 'OK'}]}, open(data_path, 'w', encoding='utf-8'), ensure_ascii=False)
+        for out_path in (link, os.path.join(tmp, 'wrong-format.csv')):
+            proc = subprocess.run([sys.executable, DOCFILL, 'results', run_sheet, data_path, out_path], capture_output=True, text=True)
+            refused.append(proc.returncode != 0)
+        check('results refuses the input under another name (symlink) and a different format',
+              all(refused) and '異常系' in run('text', run_sheet))
+
+        # A two-row header whose parent is merged across columns only: "header_rows" names the sub-columns.
+        inline = lambda ref, text: f'<c r="{ref}" t="inlineStr"><is><t>{text}</t></is></c>'
+        two_row = dict(XLSX_FILES)
+        two_row['xl/worksheets/sheet1.xml'] = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+            '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'
+            f'<row r="3">{inline("A3", "No")}{inline("B3", "シナリオ")}{inline("C3", "PC")}<c r="D3"/></row>'
+            f'<row r="4">{inline("C4", "Lần 1")}{inline("D4", "Lần 2")}</row>'
+            f'<row r="5"><c r="A5"><v>1</v></c>{inline("B5", "x")}<c r="C5"/><c r="D5"/></row>'
+            '</sheetData><mergeCells count="1"><mergeCell ref="C3:D3"/></mergeCells></worksheet>')
+        two_path = os.path.join(tmp, 'two-row.xlsx')
+        build(two_path, two_row)
+        json.dump({'id_column': 'No', 'rows': [{'No': 1, 'PC': 'OK'}]}, open(data_path, 'w', encoding='utf-8'), ensure_ascii=False)
+        ambiguous = subprocess.run([sys.executable, DOCFILL, 'results', two_path, data_path, os.path.join(tmp, 'two-a.xlsx')], capture_output=True, text=True)
+        json.dump({'id_column': 'No', 'header_rows': [3, 4], 'rows': [{'No': 1, 'PC / Lần 1': 'OK'}]}, open(data_path, 'w', encoding='utf-8'), ensure_ascii=False)
+        two_out = os.path.join(tmp, 'two-b.xlsx')
+        run('results', two_path, data_path, two_out)
+        check('results refuses a repeated column name and writes under "header_rows"',
+              ambiguous.returncode != 0 and 'repeat' in ambiguous.stderr + ambiguous.stdout
+              and any(l.startswith('5: 1 | x | OK') for l in run('text', two_out).splitlines()))
+
+        # Furigana (<rPh>) is not part of a cell's text.
+        furigana = dict(XLSX_FILES)
+        furigana['xl/sharedStrings.xml'] = XLSX_FILES['xl/sharedStrings.xml'].replace(
+            '<si><t>期待結果</t></si>', '<si><t>期待結果</t><rPh sb="0" eb="4"><t>キタイケッカ</t></rPh></si>')
+        furi_path = os.path.join(tmp, 'furigana.xlsx')
+        build(furi_path, furigana)
+        check('xlsx headers and text skip furigana', json.loads(run('inspect', furi_path))['sheets'][0]['columns'] == ['No', 'シナリオ', '期待結果'])
+
         run_csv = os.path.join(tmp, 'run.csv')
         open(run_csv, 'w', encoding='utf-8').write('ID,Scenario,Result\nTC-1,Đăng ký,\nTC-2,Đăng nhập,\n')
         json.dump({'rows': [{'ID': 'TC-2', 'Result': 'Pass'}]}, open(data_path, 'w', encoding='utf-8'))
@@ -168,6 +206,17 @@ def main():
         text = open(rcsv, encoding='utf-8-sig').read()
         check('csv results updates by ID and keeps the BOM',
               open(rcsv, 'rb').read().startswith(b'\xef\xbb\xbf') and 'TC-1,Đăng ký,\n' in text and 'TC-2,Đăng nhập,Pass' in text)
+
+        rounds = os.path.join(tmp, 'rounds.csv')
+        open(rounds, 'w', encoding='utf-8').write('ID,Result,Date,Result,Date,Note\nTC-1,Pass,10/01,,,\nTC-2,,,,,\n')
+        json.dump({'rows': [{'ID': 'TC-2', 'Note': 'retest'}]}, open(data_path, 'w', encoding='utf-8'))
+        rounds_out = os.path.join(tmp, 'rounds-out.csv')
+        run('results', rounds, data_path, rounds_out)
+        json.dump({'rows': [{'ID': 'TC-2', 'Result': 'Pass'}]}, open(data_path, 'w', encoding='utf-8'))
+        clash = subprocess.run([sys.executable, DOCFILL, 'results', rounds, data_path, os.path.join(tmp, 'r2.csv')], capture_output=True, text=True)
+        rtext = open(rounds_out, encoding='utf-8-sig').read()
+        check('csv results keeps repeated columns and refuses to write into one',
+              'TC-1,Pass,10/01,,,\n' in rtext and 'TC-2,,,,,retest' in rtext and clash.returncode != 0)
 
         csv_path = os.path.join(tmp, 't.csv')
         open(csv_path, 'w', encoding='utf-8').write('ID,Scenario,Expected\n')

@@ -19,8 +19,9 @@ Any of: ticket or story (with comments and attachments), requirements doc sectio
    - **business rules** (`BR-<AREA>-001`): the rule, its source (doc section, ticket, client decision), and whether it is enforced in the frontend, the backend, or both;
    - **data rules**: field, type, required, limits, format, default, source of the value;
    - postconditions; open questions with owner (never invent an answer).
-2. **Test cases** (default `test-cases.csv`, or the user's sheet): one row per case with ID, scenario/BR covered, preconditions, steps, test data, expected result, priority, type (positive / negative / boundary / permission / state), and empty result columns for the tester. Group rows by screen or flow (a `_section` row in workbook templates).
-3. A coverage line: every BR and every flow has at least one test case; list any that do not and why.
+2. **Test cases** (default `test-cases.csv`, or the user's sheet): one row per case with ID, scenario/BR covered, preconditions, steps, test data, expected result, priority, type (positive / negative / boundary / permission / state / transition / date / concurrency), and empty result columns for the tester. Group rows by screen or flow (a `_section` row in workbook templates).
+3. **Test data plan**: the accounts each case needs by role and status (where they are defined, never passwords), records in each state the cases use, list sizes (0, 1, exactly one page, one page + 1), long and special text, and how the data is made (seed, fixture, local mock). No real personal data.
+4. A coverage line: every BR and every flow has at least one test case; list any that do not and why.
 
 ## How to derive the cases
 - Main flow → one positive case per role or status that sees a different result.
@@ -28,7 +29,18 @@ Any of: ticket or story (with comments and attachments), requirements doc sectio
 - Each BR → a case that proves it holds and one that tries to break it.
 - Each data rule → boundaries (empty, whitespace only, max length and max + 1, full-width characters, emoji, invalid format, pasted text).
 - States from the project glossary (membership status, publication status…) → one case per state that changes what the user sees.
+- **Conditions that combine** (role × status × plan…) → a decision table: one case per column that changes the result. When many independent factors combine, cover every pair of values (pairwise) instead of every combination, and say so in the coverage line.
+- **State transitions** (order, subscription, approval) → a transition table from the requirements: each allowed transition once, and each forbidden one the UI or the API could still be asked for (for example cancelled → active), expecting a refusal.
+- **Dates and times** → end of month, 29 February, year end, the moment of an expiry or deadline (just before, at, just after), the user's timezone against the server's, and the product's date format. Missing rules (which timezone decides?) are questions.
+- **Access** → each role on each action; another user's record reached by changing the ID in the URL or the request (expect a refusal, never the data); a signed-out user on a deep link.
+- **Concurrency** → two users or two tabs changing the same record. The expected rule (conflict error, last write wins, lock) comes from the requirements; without one it is a question.
 - Platform columns in the template (PC / Tablet / iOS / Android, or breakpoints) are left for the tester; do not mark results you did not run. To run the cases and fill the results, use `qa-run`.
+
+## Test-case quality (check every row before handing over)
+- One expected result per case, observable on the screen, in the response or in the data. Banned without detail: "correctly", "normally", "as expected", "works".
+- Concrete test data (the value, not "a valid email"); steps someone new can run with exact UI labels.
+- Cases are independent: a case that needs data from another says so in its preconditions.
+- Priority follows the risk: main flows and BRs with money, access or data loss are High.
 
 ## Rules
 - Business rules come from requirements, tickets or the client. Behaviour read from the code is labelled "current behaviour" and becomes a question when it differs from the documents.

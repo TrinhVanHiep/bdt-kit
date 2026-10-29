@@ -23,7 +23,7 @@ Ask for the project's coding convention and architecture documents, then run `de
 Write down project rules that contradict common kit defaults (for example "no test suite", "tokens in localStorage on purpose", "no middleware on purpose"). Kit skills read this section and step aside.
 
 ## 4. Ask the user only for what the repo cannot tell
-Ticket system URL, requirements doc, design file, API docs URL, coding convention and architecture documents, shared environments, report language, comment tone, owners.
+Ticket system URL, requirements doc, design file, API docs URL, coding convention and architecture documents, shared environments, report language, comment tone, owners. For testing: supported browsers and devices, the test-case sheet and its result words, the bug tracker and its required fields, the severity scale and the release criteria (each one may be "none yet").
 
 ## 5. Write (after showing the user a summary)
 - `.bdt/PROJECT.md` from the template.

@@ -16,6 +16,11 @@ Recommendation: GO | GO WITH CONDITIONS | NO-GO (the team decides; this is the t
 
 Pass rate: <pass> / <run> run (<run> / <total> of the scope executed).
 
+## Coverage by requirement
+<!-- From the sheet's scenario / rule column. A requirement with no case, or only Blocked / Not run cases, is a risk below. -->
+| Requirement (AC / BR / screen) | Test cases | Result | Bugs |
+| ------------------------------ | ---------- | ------ | ---- |
+
 ## Bugs
 | Bug | Title | Severity | Priority | Status | Test cases |
 | --- | ----- | -------- | -------- | ------ | ---------- |

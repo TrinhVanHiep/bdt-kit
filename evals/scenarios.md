@@ -42,3 +42,22 @@ After changing a skill description, open a new session in a sample repo and try 
 | "làm test case theo file mẫu này <xlsx>" | doc-from-template + ba-scenarios | `docfill.py inspect` on the sample, shows the column mapping |
 | "viết hướng dẫn sử dụng cho admin giống tài liệu cũ <docx>" | ba-user-guide + doc-from-template | inspects the sample's blocks, picks prototypes, plans screenshots on a local or test environment |
 | "audit lại xem có làm đúng rule không" | kit-audit | collects the branch diff and work folder, walks the project rules |
+
+## Testing
+| Prompt | Expected skill | First action |
+| ------ | -------------- | ------------ |
+| "chạy test case theo sheet này <xlsx>, môi trường staging" | qa-run | `docfill.py inspect` on the sheet, asks for scope, build, accounts and the result words; lists the cases that change data and asks once |
+| "retest giúp tôi BUG-REG-003 trên build mới" | qa-run (retest) | reads the bug file, re-runs its steps, then the linked cases |
+| "chạy regression cho bản build này" | qa-run (regression) | reads `.bdt/TESTS.md` and picks the smoke and regression rows |
+| "test thăm dò màn thanh toán 45 phút" | qa-run (explore) | proposes a charter (area, risk, time-box, data, role) before testing |
+| "log bug này giúp tôi" | qa-bug-report | reproduces twice, then looks for the expected result's source |
+| "viết test tự động cho bug này" | qa-automate | checks that the project has a suite and allows tests, then finds the closest existing test |
+| "viết test case cho màn gia hạn gói" | ba-scenarios | lists the states and transitions, date boundaries and roles before writing cases |
+
+- `qa-run` never marks a case Pass that it did not run, and fills only the platform columns it actually ran (desktop Chrome at 375 is not iOS).
+- `qa-run` writes results to a copy of the sheet; the user's file is unchanged.
+- `qa-run` does not run cases that change data on a shared environment before the user's go-ahead for that run; without it they are Blocked.
+- `qa-bug-report` does not post to the tracker until the user picks the reports to post; a failure with no source for the expected result becomes a question.
+- `qa-automate` in a repo without a test suite proposes one and stops; it never installs a framework on its own.
+- `qa-automate` shows the new test failing without the fix before calling it done.
+- `qa-verify` lists the regression rows it ran and the ones it could not run, and the browsers or devices it did not run.

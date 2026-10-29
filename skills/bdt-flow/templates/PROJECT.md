@@ -29,8 +29,17 @@
 
 ## Verification
 - Breakpoints (web UI): 375, 768, 1440
+- Supported browsers and devices: <!-- from the client or the contract, e.g. Chrome and Edge latest 2, Safari iOS 16+, Chrome Android 12+; what is not listed is not promised -->
 - Local mock: <!-- how to run one, or "none" -->
 - Test accounts: <!-- where they are defined (seed file), never the values here -->
+- Test data: <!-- seed or fixture files, how to reset them; no real personal data -->
+- Test environments: <!-- where test runs may change data, after the user's go-ahead for each run; never production -->
+
+## Testing
+- Test-case sheet: <!-- link or path, sheet name, ID column, result words (e.g. OK / NG / Pending) -->
+- Bug tracker: <!-- e.g. Backlog project ABC; required fields; title format -->
+- Severity / priority scale: <!-- the project's own; the default is in templates/bug.md -->
+- Release criteria: <!-- e.g. no open Critical or Major bug, every smoke row passed; or "the team decides" -->
 
 ## People and tone
 - Report language: <!-- e.g. Vietnamese -->

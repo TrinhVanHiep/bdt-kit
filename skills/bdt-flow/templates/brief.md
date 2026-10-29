@@ -25,7 +25,7 @@ Revision: 1 · Source: <ticket link> · Depth: Quick | Full
 - Verify by: <!-- browser at 375/desktop, network request body, command, read-only API call -->
 
 ## States and edge cases
-<!-- Walk: loading, empty, error, partial, success, disabled, double submit; signed out / expired / wrong role / each membership status; 400 details, 401, 403, 404, 409, 429, 5xx, offline, null fields; input limits, full-width, emoji; list paging and stale cache; unmount, two tabs; deep link, back, reload; 375px, long strings, keyboard, screen reader. Keep only the ones that apply, each mapped to an AC or a question. -->
+<!-- Walk: loading, empty, error, partial, success, disabled, double submit; signed out / expired / wrong role / each membership status; 400 details, 401, 403, 404, 409, 429, 5xx, offline, null fields; input limits, full-width, emoji; dates: end of month, 29 Feb, expiry just before / at / after, user vs server timezone; another user's record by ID; forbidden state transitions; list paging and stale cache; unmount, two tabs or two users editing the same record; deep link, back, reload; 375px, long strings, keyboard, screen reader. Keep only the ones that apply, each mapped to an AC or a question. -->
 
 ## Questions
 | # | Question | Owner | Blocking | Evidence | Answer |

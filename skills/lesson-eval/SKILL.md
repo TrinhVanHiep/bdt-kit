@@ -14,7 +14,7 @@ The project's own lessons file first (for example `LESSON-LEARNED.md`), else `.b
 ## 2. Verdict
 - **Save:** new, specific, would have prevented a real defect.
 - **Improve:** an existing entry covers it but misses this case; extend that entry.
-- **Absorb:** it is really a rule; add it to the project rules or a lint rule/type instead (ask first when the rule file is shared).
+- **Absorb:** it is really a rule; add it as a CONV rule in `.bdt/dev/CONVENTIONS.md` with a Check (`dev-profile` update mode; source: the lesson, `confirmed` once the user agrees), or to the project rules or a lint rule/type (ask first when the rule file is shared).
 - **Drop:** generic advice ("be careful with X"), a one-off typo, or already covered.
 
 ## 3. Entry format
@@ -30,4 +30,4 @@ The project's own lessons file first (for example `LESSON-LEARNED.md`), else `.b
 Grep for the pattern across the repo; fix every occurrence or list them. When a tool can catch it (lint rule, type), propose adding that too.
 
 ## 5. Promote
-When the same lesson appears in two or more projects, propose a line for the kit kernel or a kit skill. The user approves every promotion. Keep the kernel short: a promotion that does not replace or sharpen an existing line probably belongs in a skill.
+When the same lesson appears in two or more projects, propose a line for the kit kernel, a kit skill, or, when it is about one technology, that technology's kit stack pack (`../dev-profile/stacks/`). The user approves every promotion. Keep the kernel short: a promotion that does not replace or sharpen an existing line probably belongs in a skill.

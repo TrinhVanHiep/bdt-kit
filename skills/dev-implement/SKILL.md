@@ -12,8 +12,8 @@ Plan: `.bdt/work/<TICKET-ID>/plan.md`; deviations go into `report.md` beside it.
 
 ## Loop per task
 1. Re-read the mirror file:line before writing.
-2. Make the smallest change for this task. Match surrounding naming, comments and idiom.
-3. Run the task's Validate step (at least typecheck or lint of the touched files).
+2. Make the smallest change for this task. Follow the CONV rules the task lists and the stack pack's idioms (`.bdt/dev/`). Match surrounding naming, comments and idiom.
+3. Run the task's Validate step (at least typecheck or lint of the touched files), and the Check of each listed CONV rule that is a grep or a lint rule.
 4. Tick the task. If you did something the plan did not say, log it: what changed, why, which AC.
 
 ## Deviations
@@ -25,10 +25,10 @@ Fix one error at a time and re-run. Stop and report when:
 - the same error survives 3 attempts;
 - a fix creates more errors than it removes;
 - the cause is architectural (wrong layer, missing contract) rather than local.
-Never silence a check (`any`, ignore comments, disabling a rule, `--no-verify`) to get green.
+Never silence a check to get green: no type escapes, ignore comments, disabled rules or skipped git hooks. The stack pack lists the forms for this stack.
 
 ## Hygiene before leaving this step
-No debug output, no commented-out code, no unused imports, no stray files, formatter run on touched files only, lockfile unchanged unless dependencies changed.
+No debug output (the stack pack lists the patterns), no commented-out code, no unused imports, no stray files, formatter run on touched files only, lockfile unchanged unless dependencies changed.
 
 ## Then
 Run `qa-verify`. Do not commit yet.

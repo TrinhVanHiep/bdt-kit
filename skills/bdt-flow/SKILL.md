@@ -12,6 +12,7 @@ Project rules win over this kit (read `AGENTS.md`, `CLAUDE.md`, `.claude/skills/
 
 ## 0. Setup (once per repo)
 If `.bdt/PROJECT.md` is missing, run `project-onboard` first. It gives links, commands, report language and comment tone.
+If `.bdt/dev/` is missing or older than the project's convention documents, or the user hands over coding conventions, run `dev-profile` before step 3. It gives the stack, app types and CONV rules that plan, build, verify and review follow.
 
 ## Work folder
 `.bdt/work/<TICKET-ID>/` holds `brief.md`, `questions.md`, `plan.md`, `report.md`. It is local (listed in `.git/info/exclude`). It is also the memory of the ticket: before a long step or a context compaction, write the current state there, so work resumes from the file, not from recollection.
@@ -22,7 +23,7 @@ If `.bdt/PROJECT.md` is missing, run `project-onboard` first. It gives links, co
 | - | ---- | ----- | ------ | ---- |
 | 1 | Understand | `ticket-brief` | brief.md (AC-NNN, facts/constraints/assumptions) | |
 | 2 | Ask | `ask-questions` | questions.md, ready to send | Stop if a blocking question is open |
-| 3 | Plan | `dev-plan` | plan.md (impact, mirror, tasks) | **Gate 1: user approves the plan** |
+| 3 | Plan | `dev-plan` | plan.md (impact, conventions, mirror, tasks) | **Gate 1: user approves the plan** |
 | 4 | Build | `dev-implement` | code + deviations in report.md | |
 | 5 | Verify | `qa-verify` (+ `qa-click-path` for "nothing happens" bugs) | report.md READY / NOT READY | |
 | 6 | Review | `pr-review` on own diff (self mode) | findings fixed or listed | |

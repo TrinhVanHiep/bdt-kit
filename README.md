@@ -70,7 +70,7 @@ There is no separate command:
 
 ### First time in a repo
 Open Claude Code in your **project** folder, not in `~/bdt-kit`.
-1. `/project-onboard` writes `.bdt/PROJECT.md` (links, commands, report language) and asks for what it cannot find in the repo.
+1. `/project-onboard` writes `.bdt/PROJECT.md` (links, commands, report language) and asks for what it cannot find in the repo. Give it the project's coding convention documents: it runs `dev-profile` to build `.bdt/dev/` (stack and conventions).
 2. `/bdt-flow <ticket ID or link>` runs the chain: brief → questions → plan. It stops for your approval of the plan, then builds, verifies and reviews, and stops again before any commit, PR or ticket comment.
 
 ### Common calls
@@ -79,6 +79,7 @@ Open Claude Code in your **project** folder, not in `~/bdt-kit`.
 | -------- | ---- |
 | Deliver a ticket end to end | `/bdt-flow ABC-12` |
 | Only understand a ticket (ACs, open questions) | `/ticket-brief <ticket link>` |
+| Set up or update a project's stack and coding conventions | `/dev-profile` and attach or link the convention document |
 | Business scenarios or test cases | `/ba-scenarios <feature>` and attach your sample sheet |
 | A user guide | `/ba-user-guide <role and features>` |
 | Any document in your company's format | `/doc-from-template` and attach the sample |

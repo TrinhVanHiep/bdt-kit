@@ -1,11 +1,11 @@
-<!-- bdt-kit kernel v0.1.0. Copy into ~/.claude/CLAUDE.md (kit-setup does it with a diff). Keep it short: it loads every session. -->
+<!-- bdt-kit kernel v0.4.0. Copy into ~/.claude/CLAUDE.md (kit-setup does it with a diff). Keep it short: it loads every session. -->
 
 # Working rules (bdt-kit)
 
 ## Precedence
 1. The user's words in chat.
 2. The project's own rules: `AGENTS.md`, `CLAUDE.md`, `.claude/skills/*`, `CONTRIBUTING.md`, lint config. Read them before the first edit in a repo.
-3. `.bdt/PROJECT.md` (links, commands, report language, comment tone).
+3. `.bdt/PROJECT.md` (links, commands, report language, comment tone) and `.bdt/dev/` (stack and coding conventions; read before the first code edit).
 4. bdt-kit skills and these rules. When a kit default conflicts with the project, follow the project and say so once.
 
 ## How I work

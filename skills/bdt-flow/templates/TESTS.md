@@ -7,3 +7,4 @@
 | TEST-<AREA>-001 | <TICKET>/AC-001 | covered | browser | /path at 375 + desktop | <input> → <observable result> | <date>: seen, request body checked |
 
 States: missing · in progress · unverified · covered · not applicable (say why).
+Levels: unit · integration · api · browser · device · cli · manual (from the app type in `.bdt/dev/STACK.md`).

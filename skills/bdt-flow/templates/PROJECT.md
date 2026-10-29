@@ -11,17 +11,24 @@
 - API docs: <!-- Swagger UI and JSON URL; base path -->
 - Environments: <!-- dev / staging / prod URLs; which are shared -->
 - Repo: <!-- remote, default branch, PR target branch -->
+- Coding conventions / architecture: <!-- doc links or paths, with version; dev-profile reads them -->
+
+## Dev profile
+- Stack and app types: <!-- one line, e.g. "Laravel 11 API + Next.js 15 web UI"; details in .bdt/dev/STACK.md -->
+- Conventions: `.bdt/dev/CONVENTIONS.md` <!-- written by dev-profile; the project's own rule files still win -->
 
 ## Commands
 - Install:
-- Dev server:
+- Dev server / run:
 - Lint:
+- Format:
 - Typecheck:
 - Build:
-- Tests: <!-- "none" is a valid answer -->
+- Tests: <!-- all, and one file; "none" is a valid answer -->
+- Migrations / codegen: <!-- or "none" -->
 
 ## Verification
-- Breakpoints: 375, 768, 1440
+- Breakpoints (web UI): 375, 768, 1440
 - Local mock: <!-- how to run one, or "none" -->
 - Test accounts: <!-- where they are defined (seed file), never the values here -->
 

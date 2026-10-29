@@ -5,7 +5,7 @@ description: Audit recent work against the project rules and the bdt-kit kernel 
 
 # kit-audit
 
-**Input:** the scope to audit (this session, a branch vs its base, a work folder, or a delivered document) and the rules: project `AGENTS.md` / `CLAUDE.md` / `.claude/skills/*`, `.bdt/PROJECT.md` overrides, the kit kernel.
+**Input:** the scope to audit (this session, a branch vs its base, a work folder, or a delivered document) and the rules: project `AGENTS.md` / `CLAUDE.md` / `.claude/skills/*`, `.bdt/PROJECT.md` overrides, `.bdt/dev/CONVENTIONS.md` and the stack packs, the kit kernel.
 **Output:** a compliance table (rule · verdict PASS / FAIL / N/A · evidence · fix), the fixes applied or proposed, and rule changes worth making.
 
 ## Collect evidence (read-only)
@@ -21,7 +21,7 @@ description: Audit recent work against the project rules and the bdt-kit kernel 
 | Stop and confirm | every shared-ground, risky, scope or business-wording item was asked, with the answer recorded |
 | Sources | API matches the spec, UI matches the design, business rules cite requirements; disagreements became questions |
 | Verification | every "done" has the command or check that proves it; no mutating calls to shared environments |
-| Project rules | each rule in the project file that the diff touches is followed (walk the file, do not sample) |
+| Project rules | each rule in the project file, and each `confirmed` CONV rule whose "Applies to" matches the diff, is followed (walk the files, do not sample) |
 | Hygiene | no debug output, dead code, unused imports, stray files, commented-out code; formatter run on touched files |
 | Lessons | each bug fix or review defect has a lesson verdict; the same pattern was searched elsewhere |
 | Deliverables | documents follow the template (sections, columns, IDs, language), no placeholders left, file opens |

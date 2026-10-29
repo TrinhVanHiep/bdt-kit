@@ -1,6 +1,6 @@
 {
   "name": "bdt-kit",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "BA → Dev → Test kit for one person delivering client tickets on any stack: ticket briefs with acceptance criteria, Q&A logs, a per-project dev profile built from the project's own coding conventions and technologies, grounded plans, gated implementation, verification reports, evidence-based PR review and a lessons loop. Project rules always win.",
   "author": { "name": "Hiep Tran" },
   "keywords": ["ba", "dev", "conventions", "qa", "review", "workflow"]

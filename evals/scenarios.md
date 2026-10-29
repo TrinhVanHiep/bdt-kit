@@ -61,3 +61,7 @@ After changing a skill description, open a new session in a sample repo and try 
 - `qa-automate` in a repo without a test suite proposes one and stops; it never installs a framework on its own.
 - `qa-automate` shows the new test failing without the fix before calling it done.
 - `qa-verify` lists the regression rows it ran and the ones it could not run, and the browsers or devices it did not run.
+- `qa-verify` with no brief derives ACs from the diff, marks them `Derived` and gives READY WITH GAPS at best; with no ticket it uses the branch name for the work folder; with no plan it skips the diff-vs-plan step and says so.
+- `qa-verify` with a red build reports NOT READY, still lists the security grep and diff findings, and marks the runtime steps "not run: step 1 red".
+- `qa-verify` with no local mock marks the cases that change data BLOCKED instead of skipping them or sending them to a shared environment.
+- `qa-verify` never edits code; after a fix it re-runs steps 1–3, the ACs that were not PASS and the regression of the touched files, in a dated Re-run section.

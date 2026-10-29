@@ -30,5 +30,6 @@ Run by `bdt-react-reviewer`; its lane is the checklist: server/client boundary, 
 
 ## Security
 - Secrets in `NEXT_PUBLIC_*` or in client components.
-- `dangerouslySetInnerHTML` with data that is not sanitised.
+- `dangerouslySetInnerHTML`, `innerHTML` / `outerHTML` assignments with data that is not sanitised.
+- `eval(`, `new Function(` and string arguments to `setTimeout` / `setInterval`.
 - Redirect targets taken from the URL without checking that they are internal.

@@ -25,7 +25,7 @@ If `.bdt/dev/` is missing or older than the project's convention documents, or t
 | 2 | Ask | `ask-questions` | questions.md, ready to send | Stop if a blocking question is open |
 | 3 | Plan | `dev-plan` | plan.md (impact, conventions, mirror, tasks) | **Gate 1: user approves the plan** |
 | 4 | Build | `dev-implement` | code + deviations in report.md | |
-| 5 | Verify | `qa-verify` (+ `qa-click-path` for "nothing happens" bugs) | report.md READY / NOT READY: ACs, regression rows, runtime QA | |
+| 5 | Verify | `qa-verify` (+ `qa-click-path` for "nothing happens" bugs) | report.md READY / READY WITH GAPS / NOT READY: ACs, regression rows, runtime QA | |
 | 6 | Review | `pr-review` on own diff (self mode) | findings fixed or listed | |
 | 7 | Ship | commit, push, PR (project conventions) | PR link, ticket comment draft | **Gate 2: user approves commit/PR/comment** |
 | 8 | Learn | `lesson-eval` | lesson saved, absorbed or dropped | |

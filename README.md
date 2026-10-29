@@ -122,7 +122,7 @@ ls -la ~/.claude/skills ~/.claude/agents | grep bdt-kit
 | `doc-from-template` | a sample file (.docx, .xlsx, .csv, .md, Google Doc/Sheet) + content | the document in the sample's format, plus a mapping note and checks |
 | `dev-plan` | approved brief, repo, dev profile | `plan.md`: impact with grep evidence, conventions that apply, patterns to mirror, tasks — **you approve** |
 | `dev-implement` | approved plan | the change, deviations logged, stop rules on errors |
-| `qa-verify` | the change, ACs, environment | `report.md` READY / NOT READY: convention checks, runtime QA by app type (browser at 375 / 768 / 1440, API calls, simulator, CLI runs) |
+| `qa-verify` | the change, ACs, environment | `report.md` READY / READY WITH GAPS / NOT READY (works without a brief or plan, and lists the gaps): convention checks, runtime QA by app type (browser at 375 / 768 / 1440, API calls, simulator, CLI runs) |
 | `qa-click-path` | a page and a symptom | traced handler findings (`CLICK-PATH-NNN`) |
 | `qa-run` | test cases (sheet, `ba-scenarios` output or `TESTS.md` rows), environment and build, test accounts | Pass / Fail / Blocked / Not run with evidence per case, written into a copy of the sheet; bug drafts; retest; regression; exploratory sessions; `summary.md` with coverage by requirement and a GO / NO-GO recommendation |
 | `qa-bug-report` | a failure, environment and build, the requirement behind the expected result | `bugs/BUG-<AREA>-NNN.md` + a paste-ready report for the tracker (posted only on request) |

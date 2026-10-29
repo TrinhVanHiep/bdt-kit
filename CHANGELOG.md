@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.1 (2026-10-29)
+`qa-verify` after a tester's review:
+- Step 0 Inputs: no ticket → branch name; no brief → ACs derived from the diff, marked `Derived`, verdict at best READY WITH GAPS; no plan → step 3 skipped as a gap; no PROJECT.md → commands from the project rules and manifest scripts.
+- Verdicts: READY / READY WITH GAPS / NOT READY with explicit rules; the runtime verdict never overrides them (DO NOT SHIP, or INCONCLUSIVE on a Required AC, means NOT READY).
+- AC status PASS / FAIL / BLOCKED / NOT VERIFIED with the brief's priority and an evidence format; personal data and tokens masked in screenshots and logs.
+- A red step 1 gives NOT READY at once; steps 2–3 still run so every static problem is reported together; runtime steps are marked not run.
+- Step 2: secret patterns for any stack, the stack pack's debug and unsafe-code patterns, new dependencies and lockfile changes.
+- Regression finds the features that share the changed code by grepping the importers of changed components, API functions, stores, hooks, types and constants, with or without a plan.
+- Runtime: cases that change data are BLOCKED without a local mock or an approved environment, never skipped; offline, session expiry in the middle of a flow, two tabs; Vietnamese and Japanese text, date, number, currency and timezone formats; idempotency of write endpoints.
+- The skill verifies only; a Re-run section after a fix. `report.md` gets Inputs, AC priority, Gaps and Re-run; the `react-next` pack gets `innerHTML`, `eval(` and `new Function(`.
+
 ## 0.5.0 (2026-10-29)
 Testing as a full loop: run the cases, record results with evidence, log bugs, retest, regression, report, automate.
 - `qa-run` skill: runs a test-case sheet, `ba-scenarios` output or `TESTS.md` rows on an environment the user names. Pass / Fail / Blocked / Not run with evidence per case; never a Pass for a case not run; platform columns only for platforms actually run (desktop Chrome at 375 is not iOS). Cases that change data on a shared environment need one go-ahead per run. Modes: run, retest, regression, explore (time-boxed charter). Ends with `summary.md`: counts, coverage by requirement, bugs, risks, GO / NO-GO recommendation.

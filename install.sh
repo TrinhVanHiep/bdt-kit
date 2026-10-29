@@ -21,6 +21,8 @@ for arg in "$@"; do
   esac
 done
 
+if [ "$DRY_RUN" -eq 1 ]; then echo "Dry run: nothing is changed, this only lists what install.sh would do."; fi
+
 run() {
   if [ "$DRY_RUN" -eq 1 ]; then echo "  would: $*"; else "$@"; fi
 }
@@ -70,7 +72,7 @@ if [ "$UNINSTALL" -eq 1 ]; then
       strip_kernel "$CLAUDE_MD" > "$CLAUDE_MD.tmp" && mv "$CLAUDE_MD.tmp" "$CLAUDE_MD"
     fi
   fi
-  echo "Done."
+  if [ "$DRY_RUN" -eq 1 ]; then echo "Dry run only: nothing was removed."; else echo "Done."; fi
   exit 0
 fi
 
@@ -97,5 +99,10 @@ if [ "$WITH_HOOKS" -eq 1 ]; then
   fi
 fi
 
-echo "Done. Start a new Claude Code session to load the skills."
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo "Dry run only: nothing was installed. Run $KIT_DIR/install.sh without --dry-run to install."
+  exit 0
+fi
+
+echo "Done. Start a new Claude Code session to load the skills, then type /bdt-flow or describe a task (see README, \"Use\")."
 [ "$WITH_HOOKS" -eq 1 ] || echo "Hooks are not installed: add --with-hooks (see extras/hooks/README.md)."

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.0 (2026-10-30)
+- Published on npm as `bdt-kit`: `npx bdt-kit install [--dry-run] [--with-hooks]` and `npx bdt-kit uninstall [--dry-run]`. The CLI (`bin/bdt-kit.js`, Node standard library only) copies the kit to `~/.bdt-kit` (`BDT_KIT_HOME` to change it), because npx runs from a temporary cache, then runs `install.sh` from there. It never touches a git clone or a folder it did not create; the dry run shows the real link targets.
+- `package.json`: no dependencies, macOS and Linux only (the installer is bash), ships skills, agents, kernel, hooks and the installer; evals and Python caches stay out.
+- README: npx install first, the git clone for changing the kit, and the plugin marketplace route.
+
 ## 0.5.2 (2026-10-29)
 `ask-questions` after a review:
 - Question lifecycle: IDs `Q-01…` shared by questions.md, the brief, CONTEXT.md and scenarios; status Open / Answered / Default applied / Obsolete; answers matched by ID and carried into the brief (`[revised rN]`), CONTEXT.md, scenarios, test cases and anything already built on the default.

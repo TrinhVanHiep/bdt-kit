@@ -20,6 +20,29 @@ There are no background agents and no auto-install, and hooks are only added on 
 
 ## Install
 
+### With npx (recommended)
+Needs Node 18+ and bash (macOS, Linux or WSL).
+
+1. Optional: preview the changes. `--dry-run` only prints what would happen and installs nothing:
+
+```bash
+npx bdt-kit install --dry-run
+```
+
+2. Install:
+
+```bash
+npx bdt-kit install
+```
+
+It copies the kit to `~/.bdt-kit` (set `BDT_KIT_HOME` for another folder) and runs `install.sh` from there, because npx runs from a temporary cache. The CLI manages that folder: edit a git clone instead (below).
+
+3. Start a **new** Claude Code session.
+
+Update with `npx bdt-kit@latest install`. Remove with `npx bdt-kit uninstall`; the copied files stay in `~/.bdt-kit` until you delete them.
+
+### From a git clone (to read or change the kit)
+
 1. Clone the kit:
 
 ```bash
@@ -56,7 +79,10 @@ Options:
 - Remove everything with `install.sh --uninstall`.
 - Update with `git -C ~/bdt-kit pull`, then run `install.sh` again.
 
-Requirements: Claude Code, `git`, `python3` (3.8+, standard library only), and `node` (only for the hooks). Check the document tools with this command:
+### As a Claude Code plugin
+In Claude Code, run `/plugin marketplace add TrinhVanHiep/bdt-kit`, then `/plugin install bdt-kit@bdt-kit`. Plugin skills carry the prefix (`/bdt-kit:bdt-flow`), and a plugin cannot write `~/.claude/CLAUDE.md`, so copy `kernel/CLAUDE.md` there yourself if you want the working rules.
+
+Requirements: Claude Code, `python3` (3.8+, standard library only), `node` (for npx and the hooks), and `git` for the clone install. Check the document tools with this command:
 
 ```bash
 python3 ~/bdt-kit/skills/bdt-flow/tools/selftest.py
@@ -98,7 +124,7 @@ Open Claude Code in your **project** folder, not in `~/bdt-kit`.
 1. The kit was cloned but `install.sh` was not run. A clone alone installs nothing. `install.sh --dry-run` installs nothing either: it only prints what it would do.
 2. The session was started before the install. Open a new session.
 3. After `git pull`, `install.sh` was not run again, so new skills have no link yet.
-4. The clone was moved or deleted after the install, so the links are broken. Run `install.sh` again from the new place.
+4. The clone (or `~/.bdt-kit`) was moved or deleted after the install, so the links are broken. Run the install again.
 5. A folder with the same name already exists in `~/.claude/skills/`, so the installer printed `skip …` and left it alone.
 6. The chat is on claude.ai instead of Claude Code (CLI, desktop Code tab or IDE extension). Local skills only load in Claude Code.
 7. On Windows, the links may not have been created. Check that the entries in `~/.claude/skills/` point to the kit.

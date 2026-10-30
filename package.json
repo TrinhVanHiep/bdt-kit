@@ -1,0 +1,47 @@
+{
+  "name": "bdt-kit",
+  "version": "0.6.0",
+  "description": "BA → Dev → Test kit for Claude Code: ticket briefs with acceptance criteria, questions with a lifecycle, grounded plans, verification reports, test runs with evidence, bug reports, PR review and a lessons loop. Project rules always win.",
+  "keywords": [
+    "claude-code",
+    "claude",
+    "skills",
+    "agents",
+    "business-analysis",
+    "qa",
+    "testing",
+    "test-cases",
+    "workflow"
+  ],
+  "homepage": "https://github.com/TrinhVanHiep/bdt-kit#readme",
+  "bugs": {
+    "url": "https://github.com/TrinhVanHiep/bdt-kit/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TrinhVanHiep/bdt-kit.git"
+  },
+  "license": "MIT",
+  "author": "Hiep Tran",
+  "bin": {
+    "bdt-kit": "bin/bdt-kit.js"
+  },
+  "files": [
+    "bin/",
+    "skills/",
+    "agents/",
+    "kernel/",
+    "extras/",
+    ".claude-plugin/",
+    "install.sh",
+    "CHANGELOG.md",
+    "!**/__pycache__/**"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ]
+}

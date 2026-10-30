@@ -1,5 +1,7 @@
 # bdt-kit
 
+[![npm](https://img.shields.io/npm/v/bdt-kit)](https://www.npmjs.com/package/bdt-kit) [![license](https://img.shields.io/npm/l/bdt-kit)](LICENSE)
+
 A Claude Code kit for one person who is BA, developer and tester on client projects.
 - **Ticket to code:** it takes a ticket from "what does this mean" to a verified PR, with two approval gates.
 - **Documents:** it produces BA documents (business scenarios, test cases, user guides, question lists) in your own template.
